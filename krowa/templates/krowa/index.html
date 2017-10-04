@@ -1,0 +1,239 @@
+{% load static %}
+
+<!DOCTYPE HTML>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Krowa search engine</title>
+<meta name="description" content="Krowa search engine">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+body {
+  margin: 0 auto;
+  padding: 1em;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+  font-size: 1em;
+  line-height: 1.4em;
+  color: #000;
+}
+
+span {
+  display: inline-block;
+  min-width: 120px;
+  vertical-align: top;
+  margin: 0 20px 0 0;
+}
+
+input, textarea {
+  min-width: 120px;
+  min-height: 1em;
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+textarea {
+    font-size: 120%;
+}
+
+#clear_form {
+    padding: 10px;
+    min-width: 300px;
+    margin: 12px 0px 10px 0px;
+}
+
+#search {
+    padding: 20px;
+    min-width: 300px;
+    margin: 0px 0px 20px 0px;
+}
+
+#search_output {
+    min-height: 5em;
+    white-space: pre-wrap;
+    margin: 0px auto;
+    border: 1px solid black;
+    padding: 1em;
+}
+
+#display {
+    height: 2em;
+}
+
+#progress_w3 {
+    width: 0%;
+}
+
+#timer {
+    display: inline;
+    text-align: right;
+    float: right;
+}
+
+#form {
+    max-width: 50%;
+    display: inline-block;
+}
+
+#patterns {
+    min-width: 20%;
+    vertical-align: top;
+    text-align: center;
+    display: inline-block;
+}
+
+input.templates {
+    display: block;
+    width: 100%;
+    height: 2em;
+    margin: 5px 0px 5px 0px;
+}
+
+#manual {
+    column-count: 1;
+    column-rule: 1px solid lightblue;
+    column-gap: 40px;
+    font-size: 90%;
+    line-height: 100%;
+}
+
+pre {
+    display: inline;
+}
+</style>
+
+<script>
+function parse_cookies() {
+    var cookies = {};
+    if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (c) {
+            var m = c.trim().match(/(\w+)=(.*)/);
+            if(m !== undefined) {
+                cookies[m[1]] = decodeURIComponent(m[2]);
+            }
+        });
+    }
+    return cookies;
+}
+var cookies = parse_cookies();
+
+var csrftoken = cookies['csrftoken'];
+
+var timer_id = null;
+var d_cnt = 0;
+var d_fps = 0;
+var d_length = 0;
+var d_data = null;
+
+String.prototype.format = function () {
+  var args = arguments;
+  return this.replace(/\{\{|\}\}|\{(\d+)\}/g, function (m, n) {
+    if (m == "{{") { return "{"; }
+    if (m == "}}") { return "}"; }
+    return args[n];
+  });
+};
+
+function display_result(msg) {
+    var data = msg['data'];
+    console.log(data)
+    document.getElementById("search_output_pre").innerHTML=data;
+}
+
+function parsing_error(response)
+{
+    var pos = response['frames'];
+    var str = response['dump'];
+
+    var line = "<h3>Parsing error!</h3><p>Position: "+pos+"</p>";
+    line += "<p>"+ str.substr(0, pos) + "</p>";
+    document.getElementById("parsing_output").innerHTML=line;
+}
+
+function search_patterns() {
+//     var arr = {
+//         'pattern' : document.getElementById("pattern").value,
+//         'fps' : document.getElementById("fps").value,
+//         'inline' : 1
+//     };
+    var form = document.forms.namedItem("krowa_data");
+    var form_data = new FormData(form);
+    console.log(form)
+    console.log(form_data);
+
+    var r = new XMLHttpRequest();
+    r.open("POST", '{% url 'krowa:search' %}', true);
+    r.onreadystatechange = function () {
+        document.getElementById('process_icon').style.visibility = "hidden";
+        if (r.readyState != 4) return;
+        if (r.status == 400)
+        {
+            var msg = JSON.parse(r.responseText);
+            if (msg['result'] == 'failed')
+            {
+                parsing_error(msg);
+                return;
+            }
+        }
+        if (r.status != 200) return
+        var msg = JSON.parse(r.responseText);
+        display_result(msg)
+    };
+    r.setRequestHeader('X-CSRFToken', csrftoken); 
+    r.send(form_data);
+    document.getElementById('process_icon').style.visibility = "visible";
+}
+
+function clear_form()
+{
+    document.getElementById("patterns_text").value = "";
+}
+
+</script>
+
+</head>
+<body>
+
+<details id="manual">
+<summary>Manual (click to expand)</summary>
+<p>
+</p>
+</details>
+
+<div class="w3-card-4">
+    <h1>{{ settings.page_title }}</h1>
+    <form class="w3-container" name="krowa_data" method="POST" enctype="multipart/form-data">
+    <div class="w3-row-padding">
+        <div class="w3-half">
+            <label>Sequence file</label><input class="w3-input w3-border" type="file" name="sequences" placeholder="File with sequences" />
+            <label>Patterns file</label><input class="w3-input w3-border" type="file" name="patterns_file" placeholder="File with patterns to search, each pattern by line"/>
+            <div class="w3-panel w3-pale-red w3-leftbar w3-border-red w3-border">
+                <p>DISCLAIMER: This software is as it is. I do not take any responsibility of failed PhD or rejected papers.</p>
+            </div>
+        </div>
+        <div class="w3-half">
+            <label>Pattern text</label><textarea class="w3-input w3-border" id="patterns_text" name="patterns_text" rows="5" cols="160" placeholder="Patterns to search, each pattern by line"></textarea>
+            <input type="button" id="clear_form" class="w3-button w3-blue" onclick="clear_form()" value="Clear text" />
+        </div>
+    </div>
+    <div style="text-align: center;">
+        <input class="w3-button w3-round-large w3-border w3-green" id="search" type="button" onclick="search_patterns()" value="SEARCH!" />
+        <span id="process_icon" style="visibility: hidden;"><i class="fa fa-spinner w3-spin" style="font-size:64px"></i></span>
+    </div>
+    </form>
+</div>
+<!--<div id="display">
+    <div class="w3-light-grey w3-round-xlarge">
+    <div id="progress_w3" class="w3-blue w3-round-large">&nbsp;</div>
+    </div>
+    <div id="timer" />
+</div>-->
+
+<p>Result will be printed here:</p>
+<div id="search_output">
+<pre id="search_output_pre" />
+</div>
+</body>
+</html>
