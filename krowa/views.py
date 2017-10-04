@@ -36,35 +36,8 @@ def get_selection(k, v, seq_start, seq_length, sta, sto, step):
     search_res += "\n\n"
     return search_res
 
-def fast_search(request):
-    seq_start = -1
-    seq_length = -1
-    sequences = {}
-    input_data = ""
-
-    patterns = [request.POST['patterns_text']][0].encode('utf-8').split()
-
-    # read patterns from 1. cli, 2. file
-    if 'patterns_file' in request.FILES and request.FILES['patterns_file'] is not None:
-        patterns += request.FILES['patterns_file'].read().splitlines()
-
-    patterns = list(filter(None, patterns))
-
-    for line in request.FILES['sequences']:
-        _l = line.strip().decode('utf-8')
-        _l = re.sub(' +',' ',_l)
-        l = _l.split(" ")
-        l_t = "".join(l[1:])
-        input_data += l_t
-        sequences[l[0]] = " ".join(l[1:])
-        if seq_start == -1:
-            seq_start = int(l[0])
-            seq_length = len(l[1])
-
+def fast_search(seq_start, seq_length, sequences, patterns, input_data, v, k, acc_r, acc_n):
     line_step = 0
-    k = list(sequences.keys())
-    v = list(sequences.values())
-
     if len(k) > 1:
         line_step = int(k[1]) - int(k[0])
 
@@ -102,37 +75,8 @@ def fast_search(request):
         content_type='application/json',
         status=200)
 
-def slow_search(request):
-    seq_start = -1
-    seq_length = -1
-    sequences = {}
-    input_data = ""
-
-    acc_r = 'accept_r' in request.POST
-    acc_n = 'accept_n' in request.POST
-
-    patterns = [request.POST['patterns_text']][0].encode('utf-8').split()
-
-    # read patterns from 1. cli, 2. file
-    if 'patterns_file' in request.FILES and request.FILES['patterns_file'] is not None:
-        patterns += request.FILES['patterns_file'].read().splitlines()
-
-    patterns = list(filter(None, patterns))
-
-    for line in request.FILES['sequences']:
-        _l = line.strip().decode('utf-8')
-        _l = re.sub(' +',' ',_l)
-        l = _l.split(" ")
-        l_t = "".join(l[1:])
-        input_data += l_t
-        sequences[l[0]] = " ".join(l[1:])
-        if seq_start == -1:
-            seq_start = int(l[0])
-            seq_length = len(l[1])
-
+def slow_search(seq_start, seq_length, sequences, patterns, input_data, v, k, acc_r, acc_n):
     line_step = 0
-    k = list(sequences.keys())
-    v = list(sequences.values())
 
     if len(k) > 1:
         line_step = int(k[1]) - int(k[0])
@@ -198,6 +142,35 @@ def slow_search(request):
 
 
 def search_krowa_sequence(request):
+    seq_start = -1
+    seq_length = -1
+    sequences = {}
+    patterns = []
+    input_data = ""
+
+    patterns = [request.POST['patterns_text']][0].encode('utf-8').split()
+
+    # read patterns from 1. cli, 2. file
+    if 'patterns_file' in request.FILES and request.FILES['patterns_file'] is not None:
+        patterns += request.FILES['patterns_file'].read().splitlines()
+
+    patterns = list(filter(None, patterns))
+
+    for line in request.FILES['sequences']:
+        _l = line.strip().decode('utf-8')
+        _l = re.sub(' +',' ',_l)
+        l = _l.split(" ")
+        l_t = "".join(l[1:])
+        input_data += l_t
+        sequences[l[0]] = " ".join(l[1:])
+        if seq_start == -1:
+            seq_start = int(l[0])
+            seq_length = len(l[1])
+
+    line_step = 0
+    k = list(sequences.keys())
+    v = list(sequences.values())
+
     if request.FILES['sequences'] is None:
         res_dict = {
             'result' : 'no sequences'
@@ -211,6 +184,6 @@ def search_krowa_sequence(request):
     acc_n = 'accept_n' in request.POST
 
     if (not acc_r and not acc_n):
-        return fast_search(request)
+        return fast_search(seq_start, seq_length, sequences, patterns, input_data, v, k, acc_r, acc_n)
     else:
-        return slow_search(request)
+        return slow_search(seq_start, seq_length, sequences, patterns, input_data, v, k, acc_r, acc_n)
