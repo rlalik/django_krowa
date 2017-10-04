@@ -67,7 +67,7 @@ def search_krowa_sequence(request):
 
             if res is None:
                 if cnt == 0:
-                    search_res += "No match for this pattern\n"
+                    search_res += "No match for this pattern\n\n"
                 break
 
             cnt += 1
