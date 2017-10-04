@@ -58,7 +58,7 @@ def search_krowa_sequence(request):
 
     for p in patterns:
         p = p.decode('utf-8')
-        search_res += "\n\nPattern: {:s}\n".format(p.strip())
+        search_res += "Pattern: {:s}\n".format(p.strip())
         pos = 0
         rex = re.compile(p.strip(), flags=re.IGNORECASE)
         cnt = 0

@@ -27,17 +27,6 @@ span {
   margin: 0 20px 0 0;
 }
 
-input, textarea {
-  min-width: 120px;
-  min-height: 1em;
-  font-size: 1em;
-  vertical-align: middle;
-}
-
-textarea {
-    font-size: 120%;
-}
-
 #clear_form {
     padding: 10px;
     min-width: 300px;
@@ -54,41 +43,11 @@ textarea {
     min-height: 5em;
     white-space: pre-wrap;
     margin: 0px auto;
-    border: 1px solid black;
     padding: 1em;
 }
 
 #display {
     height: 2em;
-}
-
-#progress_w3 {
-    width: 0%;
-}
-
-#timer {
-    display: inline;
-    text-align: right;
-    float: right;
-}
-
-#form {
-    max-width: 50%;
-    display: inline-block;
-}
-
-#patterns {
-    min-width: 20%;
-    vertical-align: top;
-    text-align: center;
-    display: inline-block;
-}
-
-input.templates {
-    display: block;
-    width: 100%;
-    height: 2em;
-    margin: 5px 0px 5px 0px;
 }
 
 #manual {
@@ -207,14 +166,26 @@ function clear_form()
     <form class="w3-container" name="krowa_data" method="POST" enctype="multipart/form-data">
     <div class="w3-row-padding">
         <div class="w3-half">
-            <label>Sequence file</label><input class="w3-input w3-border" type="file" name="sequences" placeholder="File with sequences" />
-            <label>Patterns file</label><input class="w3-input w3-border" type="file" name="patterns_file" placeholder="File with patterns to search, each pattern by line"/>
+            <p>
+            <label class="w3-text-green"><b>Sequence file</b></label>
+            <input class="w3-input w3-border" type="file" name="sequences" placeholder="File with sequences" />
+            </p>
+
+            <p>
+            <label class="w3-text-green"><b>Patterns file</b></label>
+            <input class="w3-input w3-border" type="file" name="patterns_file" placeholder="File with patterns to search, each pattern by line"/>
+            </p>
+
             <div class="w3-panel w3-pale-red w3-leftbar w3-border-red w3-border">
                 <p>DISCLAIMER: This software is as it is. I do not take any responsibility of failed PhD or rejected papers.</p>
             </div>
         </div>
         <div class="w3-half">
-            <label>Pattern text</label><textarea class="w3-input w3-border" id="patterns_text" name="patterns_text" rows="5" cols="160" placeholder="Patterns to search, each pattern by line"></textarea>
+            <p>
+            <label class="w3-text-green"><b>Pattern text</b></label>
+            <textarea class="w3-input w3-border" id="patterns_text" name="patterns_text" rows="5" cols="160" placeholder="Patterns to search, each pattern by line"></textarea>
+            </p>
+
             <input type="button" id="clear_form" class="w3-button w3-blue" onclick="clear_form()" value="Clear text" />
         </div>
     </div>
@@ -224,16 +195,8 @@ function clear_form()
     </div>
     </form>
 </div>
-<!--<div id="display">
-    <div class="w3-light-grey w3-round-xlarge">
-    <div id="progress_w3" class="w3-blue w3-round-large">&nbsp;</div>
-    </div>
-    <div id="timer" />
-</div>-->
 
 <p>Result will be printed here:</p>
-<div id="search_output">
-<pre id="search_output_pre" />
-</div>
+<div id="search_output" class="w3-card"><pre id="search_output_pre"></pre></div>
 </body>
 </html>
