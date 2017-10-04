@@ -27,6 +27,16 @@ span {
   margin: 0 20px 0 0;
 }
 
+details p {
+    font-size: 120%;
+    padding-left: 15px;
+}
+
+summary {
+    font-size: 120%;
+    padding: 5px;
+}
+
 #clear_form_btn {
     padding: 10px;
     min-width: 300px;
@@ -181,10 +191,16 @@ function copy_to_clipboard()
 </head>
 <body>
 
-<details id="manual">
-<summary>Manual (click to expand)</summary>
-<p>
-</p>
+<details id="manual" class="w3-card">
+<summary>Manual and Terms of use (click to expand)</summary>
+<div class="w3-container w3-pale-green"><h3>Terms of use</h3>
+</div>
+<p>This software is provided as free of use. However, if it helped you to produce valuable scientific results and you ended-up with a PhD thesis or journal paper, please let me know and <a href="mailto:rafallalik@gmail.com">send me an e-mail with a note</a>.</p>
+
+<div class="w3-container w3-pale-green"><h3>Usage</h3>
+</div>
+<p>Upload sequence file in a gd format, without a header section, just sequences.<p>
+<p>Upload pattern to search.</p>
 </details>
 
 <div class="w3-card-4">
@@ -205,6 +221,7 @@ function copy_to_clipboard()
             <div class="w3-panel w3-pale-red w3-leftbar w3-border-red w3-border">
                 <p>DISCLAIMER: This software is as it is. I do not take any responsibility of failed PhD or rejected papers.</p>
             </div>
+
         </div>
         <div class="w3-half">
             <p>
@@ -212,7 +229,19 @@ function copy_to_clipboard()
             <textarea class="w3-input w3-border" id="patterns_text" name="patterns_text" rows="5" cols="160" placeholder="Patterns to search, each pattern by line"></textarea>
             </p>
 
+            <p>
             <input type="button" id="clear_form_btn" class="w3-button w3-blue" onclick="clear_form()" value="Clear text" />
+            </p>
+
+            <div class="w3-row-padding">
+                <div class="w3-third">
+                    <p><input class="w3-check" name="accept_r" type="checkbox" checked="checked">                    <label>Accept R</label></p>
+                </div>
+                <div class="w3-third">
+                    <p><input class="w3-check" name="accept_n" type="checkbox">
+                    <label>Accept N</label></p>
+                </div>
+            </div>
         </div>
     </div>
     <div style="text-align: center;">
