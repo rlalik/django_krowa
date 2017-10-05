@@ -148,6 +148,9 @@ def search_krowa_sequence(request):
     patterns = []
     input_data = ""
 
+    file_format = 0 # 1 == genbank
+    filter_header = True
+
     patterns = [request.POST['patterns_text']][0].encode('utf-8').split()
 
     # read patterns from 1. cli, 2. file
@@ -160,6 +163,26 @@ def search_krowa_sequence(request):
         _l = line.strip().decode('utf-8')
         _l = re.sub(' +',' ',_l)
         l = _l.split(" ")
+
+        # check for file format
+        if file_format == 0:
+            try:
+                int(l[0])
+                filter_header = False
+            except:
+                if l[0] == 'LOCUS':
+                    file_format = 1
+
+        # header filet for genbank
+        if file_format == 1:
+            if filter_header == True:
+                if l[0] == 'ORIGIN':
+                    filter_header = False
+                continue
+            if filter_header == False:
+                if l[0] == '//':
+                    break
+
         l_t = "".join(l[1:])
         input_data += l_t
         sequences[l[0]] = " ".join(l[1:])

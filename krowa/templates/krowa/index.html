@@ -107,7 +107,6 @@ String.prototype.format = function () {
 
 function display_result(msg) {
     var data = msg['data'];
-    console.log(data)
     document.getElementById("search_output_pre").innerHTML=data;
 }
 
@@ -118,19 +117,12 @@ function parsing_error(response)
 
     var line = "<h3>Parsing error!</h3><p>Position: "+pos+"</p>";
     line += "<p>"+ str.substr(0, pos) + "</p>";
-    document.getElementById("parsing_output").innerHTML=line;
+    document.getElementById("search_output").innerHTML=line;
 }
 
 function search_patterns() {
-//     var arr = {
-//         'pattern' : document.getElementById("pattern").value,
-//         'fps' : document.getElementById("fps").value,
-//         'inline' : 1
-//     };
     var form = document.forms.namedItem("krowa_data");
     var form_data = new FormData(form);
-    console.log(form)
-    console.log(form_data);
 
     var r = new XMLHttpRequest();
     r.open("POST", '{% url 'krowa:search' %}', true);
@@ -153,6 +145,7 @@ function search_patterns() {
     r.setRequestHeader('X-CSRFToken', csrftoken); 
     r.send(form_data);
     document.getElementById('process_icon').style.visibility = "visible";
+    document.getElementById('search_output_pre').innerHTML = "No result yet";
 }
 
 function clear_form()
